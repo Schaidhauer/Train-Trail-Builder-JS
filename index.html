@@ -1,0 +1,269 @@
+<html>
+<head>
+<style>
+body {margin:0px;}
+td {border: 1px solid #ddd;}
+/*td:hover {background-color:#ccc;}*/
+table{border-spacing: 0px;}
+/*tr { border: 1px solid #ccc;}*/
+#divTable table {width:100%; height:90%;}
+#tools table{height:25px;}
+#tools table td{width:20px;}
+
+/*.tdClick {height:52px;width:52px;}*/
+.tdClick {background-repeat: no-repeat;}
+
+#console{width:100%;height:5%;color:#333;}
+#tools{text-align:center;}
+</style>
+</head>
+<body>
+<div id='loadder' style='display:none'><textarea id='idTextLoader'>Cole aqui</textarea><input type='button' id='btnLoadExecute' value='Carregar'/></div>
+<div id='console'></div>
+<div id='tools'></div>
+<div id='divTable'></div>
+
+<script src="jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+
+	function traduzNumeroClicado(n){
+		if (n == 48)
+			return 0;
+		else if (n == 49)
+			return 1;
+		else if (n == 50)
+			return 2;
+		else if (n == 51)
+			return 3;
+		else if (n == 52)
+			return 4;
+		else if (n == 53)
+			return 5;
+		else if (n == 54)
+			return 6;
+		else if (n == 55)
+			return 7;
+		else if (n == 56)
+			return 8;
+		else if (n == 57)
+			return 9;
+	}
+
+    $(document).ready(function(){
+	
+		var ferramentaSelecionada = 1;
+		var nIcones = 26;
+		
+        //para mudar as ferramentas
+        $( "body" ).on( "click", "#toolTable td", function() {
+			//alert('oi');
+			$('#toolTable td').css('border', '#ccc 1px solid');
+			
+			$(this).css('border', '#F00 1px solid');
+			ferramentaSelecionada = parseInt($(this).attr('ref'));
+			
+		});
+		
+		
+		//mudar as ferramentas com o teclado
+		$(document).keyup(function(e) {
+			
+			var num = parseInt(e.keyCode);
+			if ((num >= 48 && num <= 57) || (num >= 96 && num <= 105)) { 
+				//console.log(e.keyCode);
+				var cliqueNum = traduzNumeroClicado(num);
+				console.log(cliqueNum);
+				
+				$('#toolTable td').css('border', '#ccc 1px solid');
+				$("#tool-"+cliqueNum).css('border', '#F00 1px solid');
+				ferramentaSelecionada = parseInt($("#tool-"+cliqueNum).attr('ref'));
+			}
+		});
+
+
+		
+        //$("#bodyTable td").mouseover(function() {
+		$( "body" ).on( "mouseleave", "#bodyTable td", function() {
+			var ref = $(this).attr("ref");
+			
+			if (ref == 0){
+				$(this).css('background-image', '');
+			}
+			
+			$(this).css('opacity', '1');
+		
+		});
+		$( "body" ).on( "mouseover", "#bodyTable td", function() {
+		
+			var ref = $(this).attr("ref");
+			
+			if (ref == 0){
+				$(this).css('background-image', 'url(img/c-'+ferramentaSelecionada+'.png)');
+				$(this).css('opacity', '0.2');
+			}
+		
+		});
+		
+        $( "body" ).on( "click", "#bodyTable td", function() {
+			var linha = $(this).closest("tr").index()+1;
+			var coluna = $(this).closest("td").index()+1;
+			
+			$('#console').html('Linha: '+linha+" - Coluna: "+coluna);
+            //alert('Linha: '+linha+" - Coluna: "+coluna);
+			
+			//var ref = parseInt($(this).closest("td").attr('ref'));
+			
+			
+			/*var ref = parseInt($(this).attr('ref'));
+			//alert(ref);
+			if (ref == 0)
+				ref = 1;
+			else
+				ref = parseInt(ref)+1;
+				
+			
+			if (ref > 10)
+				ref = 0;
+			
+			$(this).attr('ref', ref);
+			
+			$(this).css('background-image', 'url(img/c-'+ref+'.png)');*/
+			
+			if (ferramentaSelecionada == 0)
+				$(this).css('background-image', '');
+			else
+				$(this).css('background-image', 'url(img/c-'+ferramentaSelecionada+'.png)');
+				
+			$(this).attr('ref', ferramentaSelecionada);
+			$(this).attr('ref2', linha+"x"+coluna);
+				
+			//$(this).css('background-size', 'contain');
+
+        });
+		
+		
+		
+		var windowWidth = $(window).width(); //retrieve current window width
+		var windowHeight = $(window).height(); //retrieve current window height
+		//alert(windowWidth+" x "+windowHeight);
+		
+		var tableLargura = Math.floor(windowWidth/50)-1;
+		var tableAltura = Math.floor(windowHeight/50)-1;
+		//alert(tableLargura+" x "+tableAltura);
+		
+		//$('#console').html(windowWidth+" x "+windowHeight+' || '+tableLargura+" x "+tableAltura);
+		
+		var content = "<table id='bodyTable'>";
+		content += "<tbody>";
+		for(i=0; i<tableAltura; i++){
+			//content += '<tr><td>' + 'result ' +  i + '</td></tr>';
+			content += '<tr>';
+			for(ii=0; ii<tableLargura; ii++){
+				content += '<td ref="0" ref2="'+(i+1)+'x'+(ii+1)+'" class="tdClick"></td>';
+			}
+			content += '</tr>';
+		}
+		content += "</tbody>";
+		content += "</table>";
+		
+		$('#divTable').append(content);
+		
+		var content = "<table id='toolTable' style='margin-left: auto;margin-right: auto;'>";
+		content += "<tbody>";
+		content += '<tr>';
+		
+			content += '<td ref="0" class="tdTool" id="saveBtn" style="background-image: url/img/save.png);background-size: 22px;"></td>';
+			content += '<td ref="0" class="tdTool" id="loadBtn" style="background-image: url(img/load.png);background-size: 23px;"></td>';
+			
+			content += '<td ref="0" class="tdTool" style="background-size: 25px;"></td>';
+			
+			for(ii=1; ii<nIcones; ii++){
+				var divinside = "<div style='vertical-align: top;font-size:10px;position: relative;bottom: 18px;text-align: center;'>"+ii+"</div>";
+				content += '<td ref="'+ii+'" class="tdTool" id="tool-'+ii+'" style="background-image: url(img/c-'+ii+'.png);background-size: 25px;">'+divinside+'</td>';
+			}
+			
+		content += '</tr>';
+		content += "</tbody>";
+		content += "</table>";
+
+		$('#tools').append(content);
+		
+		$('#tool-1').css('border', '#F00 1px solid');
+		
+		
+		$( "body" ).on( "click", "#btnLoadExecute", function() {
+			
+			var dataLoad = $("#idTextLoader").val().split('p');
+			var toLoad = [];
+			for (i = 0; i < dataLoad.length; i++) {
+				var arrtemp = dataLoad[i].split('-');
+				//console.log(arrtemp);
+				var arrpos = arrtemp[1].split('x');
+				toLoad.push([arrtemp[0],arrpos[0],arrpos[1]]);
+			}
+			
+			//console.log(toLoad);
+			
+			
+			$("#bodyTable td").each(function() {
+				var linha2 = $(this).closest("tr").index()+1;
+				var coluna2 = $(this).closest("td").index()+1;
+				
+				//$('#console').html('Linha: '+linha2+" - Coluna: "+coluna2);
+				$('#console').html('Carregando.');
+				
+				for (i = 0; i < toLoad.length; i++) {
+					if ((linha2 == toLoad[i][1]) && (coluna2 == toLoad[i][2])){
+						if (toLoad[i][0] > 0)
+							$(this).css('background-image', 'url(img/c-'+toLoad[i][0]+'.png)');
+					}
+				}
+				
+				$('#console').html('Carregado com sucesso.');
+				
+				
+			
+				/*var ref = $(this).attr("ref");
+				var ref2 = $(this).attr("ref2");
+				saveTxt += ref+"-"+ref2+"|";*/
+			});
+		
+		});
+		
+		$( "body" ).on( "click", "#loadBtn", function() {
+			$("#loadder").show();
+		
+		
+		});
+		
+		var saveTxt = "";
+		var reftemp = "";
+		$( "body" ).on( "click", "#saveBtn", function() {
+			//console.log("teste");
+			
+			$("#bodyTable td").each(function() {
+				var ref = $(this).attr("ref");
+				var ref2 = $(this).attr("ref2");
+				saveTxt += ref+"-"+ref2+"p";				
+			});
+			
+			saveTxt = saveTxt.replace(/p+$/, '');
+			
+			var a = window.document.createElement('a');
+			a.href = window.URL.createObjectURL(new Blob([saveTxt], {type: 'text/plain'}));
+			//a.download = 'brincando-tremzinho'+new Date().toString()+'.txt';
+			a.download = 'brincando-tremzinho.txt';
+
+			// Append anchor to body.
+			document.body.appendChild(a)
+			a.click();
+
+			// Remove anchor from body
+			document.body.removeChild(a)
+		});
+		
+    });
+
+</script>
+</body>
+</html>
